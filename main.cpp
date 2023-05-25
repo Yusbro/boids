@@ -14,7 +14,7 @@ namespace Boid{
 		for(int i=0;i<100;i++){
 			Flock temp_flock = {
 				(Vector2){(float)GetRandomValue(0, 800), (float)GetRandomValue(0, 600)},
-				(Vector2){0.0, 5.0},
+				(Vector2){0.0, 1.0},
 				i
 			};
 			flocks.push_back(temp_flock);
@@ -36,8 +36,8 @@ namespace Boid{
 			float distance = Vector2Distance(origin.position, f.position);
 			if(origin.id==f.id) continue;
 			if(distance < seperation_strength){
-				avg_seperation.x += f.position.x - origin.position.x;
-				avg_seperation.y += f.position.y - origin.position.y;
+				avg_seperation.x += (f.position.x - origin.position.x) * (seperation_strength - distance);
+				avg_seperation.y += (f.position.y - origin.position.y) * (seperation_strength - distance);
 				counter++;
 			}
 		}
@@ -47,6 +47,7 @@ namespace Boid{
 		avg_seperation.x /= -counter;
 		avg_seperation.y /= -counter;
 		
+		//avg_seperation = Vector2Multiply(avg_seperation, (Vector2){2,2});
 		return avg_seperation;
 	}
 	
@@ -93,9 +94,7 @@ namespace Boid{
 			}	
 		}
 		
-		
 		if(counter == 0) return (Vector2){0,0};
-
 		avg_alignment = Vector2Normalize(avg_alignment);
 
 		return avg_alignment;
@@ -103,10 +102,10 @@ namespace Boid{
 
 
 	void update(std::vector<Flock> &flocks){
-		for(Flock f : flocks){
-			Vector2 mouse_pos = GetMousePosition();
-			float distance = Vector2Distance(f.position, mouse_pos);
-			if(distance > 10) continue;
+		for(Flock &f : flocks){
+			//Vector2 mouse_pos = GetMousePosition();
+			//float distance = Vector2Distance(f.position, mouse_pos);
+			//if(distance > 10) continue;
 			
 			Vector2 seperation_val = seperation(flocks, f);
 			Vector2 cohesion_val = cohesion(flocks, f);
@@ -118,20 +117,23 @@ namespace Boid{
 			
 			avg_direction = Vector2Add(avg_direction, seperation_val);
 			avg_direction = Vector2Add(avg_direction, cohesion_val);
-			//avg_direction = Vector2Add(avg_direction, alignment_val);
+			avg_direction = Vector2Add(avg_direction, alignment_val);
 			
-			//avg_direction.x/=2;
-			//avg_direction.y/=2;
+			avg_direction = Vector2Normalize(avg_direction);
+			
+			f.direction = avg_direction;
+			
+			f.position = Vector2Add(f.direction, f.position);
 
-
+			/*
 			//the actual stuff!!
 			DrawCircle(f.position.x, f.position.y, 50, BLACK);
 			DrawCircle(seperation_val.x + f.position.x, seperation_val.y + f.position.y, 10, GREEN);//green is seperation!!
 			DrawCircle(cohesion_val.x + f.position.x, cohesion_val.y + f.position.y, 10, BLUE); //blue is cohesion!!
-			DrawCircle(alignment_val.x + f.position.y, alignment_val.y + f.position.y, 10, YELLOW);
+			DrawCircle(alignment_val.x + f.position.x, alignment_val.y + f.position.y, 10, YELLOW);
 			
 			DrawCircle(f.position.x + avg_direction.x, f.position.y + avg_direction.y, 12, VIOLET);
-			DrawLine(f.position.x, f.position.y, avg_direction.x + f.position.x, avg_direction.x + f.position.y, VIOLET);
+			DrawLine(f.position.x, f.position.y, avg_direction.x + f.position.x, avg_direction.x + f.position.y, VIOLET);*/
 		}
 	}
 }
