@@ -41,6 +41,9 @@ namespace Boid{
 				counter++;
 			}
 		}
+		if(counter == 0) return (Vector2){0,0};
+
+
 		avg_seperation.x /= -counter;
 		avg_seperation.y /= -counter;
 		
@@ -62,6 +65,11 @@ namespace Boid{
 				counter++;
 			}
 		}
+
+		
+		if(counter == 0) return (Vector2){0,0};
+
+
 		avg_cohesion.x /= counter;
 		avg_cohesion.y /= counter;
 
@@ -84,9 +92,11 @@ namespace Boid{
 				counter++;
 			}	
 		}
+		
+		
+		if(counter == 0) return (Vector2){0,0};
 
-		avg_alignment.x /= counter;
-		avg_alignment.y /= counter;
+		avg_alignment = Vector2Normalize(avg_alignment);
 
 		return avg_alignment;
 	}
@@ -102,11 +112,26 @@ namespace Boid{
 			Vector2 cohesion_val = cohesion(flocks, f);
 			Vector2 alignment_val = alignment(flocks, f);
 
+
+			Vector2 avg_direction = (Vector2){0,0};// Vector2Add(seperation_val, cohesion_val);
+			
+			
+			avg_direction = Vector2Add(avg_direction, seperation_val);
+			avg_direction = Vector2Add(avg_direction, cohesion_val);
+			//avg_direction = Vector2Add(avg_direction, alignment_val);
+			
+			//avg_direction.x/=2;
+			//avg_direction.y/=2;
+
+
 			//the actual stuff!!
 			DrawCircle(f.position.x, f.position.y, 50, BLACK);
 			DrawCircle(seperation_val.x + f.position.x, seperation_val.y + f.position.y, 10, GREEN);//green is seperation!!
 			DrawCircle(cohesion_val.x + f.position.x, cohesion_val.y + f.position.y, 10, BLUE); //blue is cohesion!!
 			DrawCircle(alignment_val.x + f.position.y, alignment_val.y + f.position.y, 10, YELLOW);
+			
+			DrawCircle(f.position.x + avg_direction.x, f.position.y + avg_direction.y, 12, VIOLET);
+			DrawLine(f.position.x, f.position.y, avg_direction.x + f.position.x, avg_direction.x + f.position.y, VIOLET);
 		}
 	}
 }
