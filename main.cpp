@@ -23,13 +23,14 @@ namespace Boid{
 	
 	void draw(std::vector<Flock> &flocks){
 		for(Flock f : flocks){
-			DrawCircle(f.position.x, f.position.y, 5, RED);	
+			DrawCircle(f.position.x, f.position.y, 5, RED);
+			DrawLine(f.position.x, f.position.y, f.position.x + f.direction.x*15, f.position.y + f.direction.y*15, RED);
 		}	
 	}
 
 	Vector2 seperation(std::vector<Flock> &flocks, Flock origin){
 		Vector2 avg_seperation = (Vector2){0,0};	
-		float seperation_strength = 50;
+		float seperation_strength = 20;
 		
 		int counter = 0;
 		for(Flock f : flocks){
@@ -60,7 +61,7 @@ namespace Boid{
 		for(Flock f : flocks){
 			float distance = Vector2Distance(origin.position, f.position);
 			if(origin.id==f.id) continue;
-			if(distance > seperation_strength && distance < 50){
+			if(distance > seperation_strength && distance < 5){
 				avg_cohesion.x += f.position.x - origin.position.x;
 				avg_cohesion.y += f.position.y - origin.position.y;
 				counter++;
@@ -79,7 +80,13 @@ namespace Boid{
 	
 	
 	Vector2 alignment(std::vector<Flock> &flocks, Flock origin){
-		Vector2 avg_alignment = (Vector2){0,0};
+
+		//Vector2 mouse_pos = GetMousePosition();
+
+		Vector2 avg_alignment = (Vector2){0,0};//Vector2Subtract(mouse_pos, origin.position);
+		//avg_alignment = Vector2Divide(avg_alignment, (Vector2){2,2});
+
+
 		float align_strength = 50;
 
 		int counter = 0;
@@ -124,16 +131,13 @@ namespace Boid{
 			f.direction = avg_direction;
 			
 			f.position = Vector2Add(f.direction, f.position);
-
-			/*
-			//the actual stuff!!
-			DrawCircle(f.position.x, f.position.y, 50, BLACK);
-			DrawCircle(seperation_val.x + f.position.x, seperation_val.y + f.position.y, 10, GREEN);//green is seperation!!
-			DrawCircle(cohesion_val.x + f.position.x, cohesion_val.y + f.position.y, 10, BLUE); //blue is cohesion!!
-			DrawCircle(alignment_val.x + f.position.x, alignment_val.y + f.position.y, 10, YELLOW);
 			
-			DrawCircle(f.position.x + avg_direction.x, f.position.y + avg_direction.y, 12, VIOLET);
-			DrawLine(f.position.x, f.position.y, avg_direction.x + f.position.x, avg_direction.x + f.position.y, VIOLET);*/
+
+			if(f.position.x < 0) f.position.x = 799;
+			if(f.position.x > 800) f.position.x = 1;
+
+			if(f.position.y < 0) f.position.y = 599;
+			if(f.position.y > 600) f.position.y = 1;
 		}
 	}
 }
